@@ -1,3 +1,4 @@
+#include "funcoes.h"
 #include "outros.h"
 
 void linha(char ch, unsigned char tam)
