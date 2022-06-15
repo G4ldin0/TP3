@@ -3,6 +3,7 @@
 
 int main()
 {
+	//definição dos caracteres
 	setlocale(LC_ALL, "portuguese");
 
 
