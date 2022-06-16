@@ -1,1 +1,0 @@
-void linha(char ch, unsigned char tam);
