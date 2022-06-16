@@ -16,11 +16,9 @@ istream& operator>>(istream&, produto&);
 
 void linha(char = '=', unsigned char = 24);
 produto* AumentarTamanhodeVetor(produto[], char*);
-produto* RemoverElementodeVetor(produto[], char, char);
-
 void menu();
 
-produto* Adicionar(produto[], char*);
-void Listar(produto[], char*);
+void Adicionar(produto*, char*);
+void Listar(produto*, char);
 
-produto* Excluir(produto[], char*);
+void Excluir(produto*, char*);

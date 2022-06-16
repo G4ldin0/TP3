@@ -40,25 +40,19 @@ int main()
 		switch (EscolhaMenu)
 		{
 			case 'A':
-				estoque = Adicionar(estoque, &TamEstoque);
+				Adicionar(estoque, &TamEstoque);
 			break;
 
 			case 'E':
-				estoque = Excluir(estoque,&TamEstoque);
+				Excluir(estoque,&TamEstoque);
 			break;
 
 			case 'L':
-				//Listar(estoque, &TamEstoque);
-				for (int i = 0; i < TamEstoque; i++)
-				{
-					cout << estoque[i].nome << " " << estoque[i].preco << " " << estoque[i].quantidade << endl;
-				}
-				system("Pause");
+				Listar(estoque, TamEstoque);
 			break;
 			
 			case 'S':
 				cout << "Finalizando...\n";
-				system("Pause");
 			break;
 
 			default:
