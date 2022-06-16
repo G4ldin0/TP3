@@ -73,7 +73,7 @@ void Pedir(produto* estoque, char* tamanho)
 	{
 		cout << "Arquivo não encontrado! Tente novamente...";
 		system("Pause");
-
+		system("Cls");
 		cout << "Nome do arquivo: ";
 		cin >> nomedoArquivo;
 
@@ -121,89 +121,93 @@ void Pedir(produto* estoque, char* tamanho)
 
 	}
 
+	
+
 	//processamento das informações
-	if (falha)
+	if (falha) //se tem falha
 	{
 		for(int i = 0; i < 5; i++)
 		{
 			if (pedido[i].quantidade > estoque[i].quantidade)
-			{
-				cout << pedido[i].nome << ": Solicitado = " << pedido[i].quantidade << "kg / Em estoque = " << estoque[i].quantidade << endl;
-			}
+				cout << pedido[i].nome << ": Solicitado = " << pedido[i].quantidade << "kg / Em estoque = " << estoque[i].quantidade << "kg" << endl;
 		}
 	}
-
-	float valordaCompra{};
-	float desconto{};
-	for (int i = 0; i < 5; i++){
-		pedido[i].preco = estoque[i].preco * pedido[i].quantidade;
-		valordaCompra += pedido[i].preco;
-	}
-
-	if (valordaCompra >= 1000.0f) desconto = valordaCompra * 0.10f;
-
-
-	//output do recibo
-	ofstream fout;
-	fout.open(strcat(nomedoArquivo, ".nfc"));
-	fout.fill(' ');
-	fout << "Pizzaria Mamute\n";
-	linha(fout, '-', 50);
-	for (int i = 0; i < 5; i++)
+	else //se não tiver
 	{
-		fout.width(10); 
-		fout << left << pedido[i].nome;
-		fout << pedido[i].quantidade;
-		fout.width(5);
-		fout << left << "kg";
-		fout << "a   ";
-		fout << fixed; fout.precision(2);
-		fout << left << estoque[i].preco;
-		
-		int tamNum{};
-		int temp = estoque[i].preco;
-		while (temp / 10 != 0)
-		{
-			tamNum++;
-			temp /= 10;
+
+		float valordaCompra{};
+		float desconto{};
+		for (int i = 0; i < 5; i++){
+			pedido[i].preco = estoque[i].preco * pedido[i].quantidade;
+			valordaCompra += pedido[i].preco;
+			estoque[i].quantidade -= pedido[i].quantidade;
 		}
 
-		fout.width(8-tamNum);
-		fout << left << "/kg";
-		fout << "=   R$";
+		if (valordaCompra >= 1000.0f) desconto = valordaCompra * 0.10f;
+
+
+		//output do recibo
+		ofstream fout;
+		fout.open(strcat(nomedoArquivo, ".nfc"));
+		fout.fill(' ');
+		fout << "Pizzaria Mamute\n";
+		linha(fout, '-', 50);
+		for (int i = 0; i < 5; i++)
+		{
+			fout.width(10); 
+			fout << left << pedido[i].nome;
+			fout << pedido[i].quantidade;
+			fout.width(5);
+			fout << left << "kg";
+			fout << "a   ";
+			fout << fixed; fout.precision(2);
+			fout << left << estoque[i].preco;
+		
+			int tamNum{};
+			int temp = estoque[i].preco;
+			while (temp / 10 != 0)
+			{
+				tamNum++;
+				temp /= 10;
+			}
+
+			fout.width(8-tamNum);
+			fout << left << "/kg";
+			fout << "=   R$";
+			fout << fixed; fout.precision(2);
+			fout << pedido[i].preco;
+			fout.precision(0);
+			fout << endl;
+		}
+
+		linha(fout, '-', 50);
+
+
+		fout.width(30); fout << right << "Compra";
+		fout << "   =   R$";
 		fout << fixed; fout.precision(2);
-		fout << pedido[i].preco;
-		fout.precision(0);
+		fout << valordaCompra;
 		fout << endl;
+
+		fout.width(30); fout << right << "Desconto";
+		fout << "   =   R$";
+		fout << fixed; fout.precision(2);
+		fout << desconto;
+		fout << endl;
+
+		fout.width(30); fout << right << "Total";
+		fout << "   =   R$";
+		fout << fixed; fout.precision(2); 
+		fout << valordaCompra - desconto;
+		fout << endl;
+
+		fout.close();
+
+
+
+		cout << "Recibo criado.\n";
+		system("Pause");
 	}
-
-	linha(fout, '-', 50);
-
-
-	fout.width(30); fout << right << "Compra";
-	fout << "   =   R$";
-	fout << fixed; fout.precision(2);
-	fout << valordaCompra;
-	fout << endl;
-
-	fout.width(30); fout << right << "Desconto";
-	fout << "   =   R$";
-	fout << fixed; fout.precision(2);
-	fout << desconto;
-	fout << endl;
-
-	fout.width(30); fout << right << "Total";
-	fout << "   =   R$";
-	fout << fixed; fout.precision(2); 
-	fout << valordaCompra - desconto;
-	fout << endl;
-
-	fout.close();
-
-
-
-	cout << "Recibo criado.\n";
-	system("Pause");
 }
 
 void Adicionar(produto* lista, char* tamanho)
