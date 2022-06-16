@@ -14,11 +14,11 @@ struct produto
 
 istream& operator>>(istream&, produto&);
 
-void linha(char = '=', unsigned char = 24);
+void linha(ostream& = cout, char = '=', unsigned char = 24);
 produto* AumentarTamanhodeVetor(produto[], char*);
 void menu();
 
+void Pedir(produto*, char*);
 void Adicionar(produto*, char*);
 void Listar(produto*, char);
-
 void Excluir(produto*, char*);

@@ -15,10 +15,10 @@ istream& operator>>(istream& is, produto& a)
 
 //funções de caso geral
 
-void linha(char ch, unsigned char tam) {
+void linha(ostream& os, char ch, unsigned char tam) {
 	for (char i = 0; i < tam; i++)
-		cout << ch;
-	cout << endl;
+		os << ch;
+	os << endl;
 }
 
 produto* AumentarTamanhodeVetor(produto vetor[], char* tamanho)
@@ -54,6 +54,157 @@ void menu() {
 
 
 //funções do sistema
+
+void Pedir(produto* estoque, char* tamanho)
+{
+	//abrindo o arquivo
+	char nomedoArquivo[16];
+	char txt[16]{};
+	ifstream fin;
+
+	cout << "Nome do arquivo: ";
+	cin >> nomedoArquivo;
+
+	strcpy(txt, nomedoArquivo);
+	strcat(txt, ".txt");
+
+	fin.open(txt);
+	while(!fin.is_open())
+	{
+		cout << "Arquivo não encontrado! Tente novamente...";
+		system("Pause");
+
+		cout << "Nome do arquivo: ";
+		cin >> nomedoArquivo;
+
+		strcpy(txt, nomedoArquivo);
+		strcat(txt, ".txt");
+
+		fin.open(txt);
+
+		system("Cls");
+	}
+
+
+
+	//vetor com pedidos
+	produto* pedido = new produto[8]{};
+
+	bool falha{};
+
+	//entrada das informações
+	produto temp;
+	fin.getline(temp.nome, 16);
+	fin.getline(temp.nome, 16);
+	while (!fin.eof())
+	{
+
+		//recebe o nome do produto
+		fin >> temp.nome;
+		//formaliza o nome
+		temp.nome[0] = toupper(temp.nome[0]);
+		for(int i = 1; temp.nome[i] != '\0'; i++)
+			temp.nome[i] = tolower(temp.nome[i]);
+
+
+		//recebe a quantidade solicitada
+		fin >> temp.quantidade;
+
+
+		//confere onde adicionar a quantidade no vetor dinâmico
+		int pos = 0;
+		for(pos; strcmp(temp.nome, estoque[pos].nome); pos++)
+			if(temp.quantidade > estoque[pos].quantidade)
+				falha = true;
+		strcpy(pedido[pos].nome, temp.nome);
+		pedido[pos].quantidade += temp.quantidade;
+
+	}
+
+	//processamento das informações
+	if (falha)
+	{
+		for(int i = 0; i < 5; i++)
+		{
+			if (pedido[i].quantidade > estoque[i].quantidade)
+			{
+				cout << pedido[i].nome << ": Solicitado = " << pedido[i].quantidade << "kg / Em estoque = " << estoque[i].quantidade << endl;
+			}
+		}
+	}
+
+	float valordaCompra{};
+	float desconto{};
+	for (int i = 0; i < 5; i++){
+		pedido[i].preco = estoque[i].preco * pedido[i].quantidade;
+		valordaCompra += pedido[i].preco;
+	}
+
+	if (valordaCompra >= 1000.0f) desconto = valordaCompra * 0.10f;
+
+
+	//output do recibo
+	ofstream fout;
+	fout.open(strcat(nomedoArquivo, ".nfc"));
+	fout.fill(' ');
+	fout << "Pizzaria Mamute\n";
+	linha(fout, '-', 50);
+	for (int i = 0; i < 5; i++)
+	{
+		fout.width(10); 
+		fout << left << pedido[i].nome;
+		fout << pedido[i].quantidade;
+		fout.width(5);
+		fout << left << "kg";
+		fout << "a   ";
+		fout << fixed; fout.precision(2);
+		fout << left << estoque[i].preco;
+		
+		int tamNum{};
+		int temp = estoque[i].preco;
+		while (temp / 10 != 0)
+		{
+			tamNum++;
+			temp /= 10;
+		}
+
+		fout.width(8-tamNum);
+		fout << left << "/kg";
+		fout << "=   R$";
+		fout << fixed; fout.precision(2);
+		fout << pedido[i].preco;
+		fout.precision(0);
+		fout << endl;
+	}
+
+	linha(fout, '-', 50);
+
+
+	fout.width(30); fout << right << "Compra";
+	fout << "   =   R$";
+	fout << fixed; fout.precision(2);
+	fout << valordaCompra;
+	fout << endl;
+
+	fout.width(30); fout << right << "Desconto";
+	fout << "   =   R$";
+	fout << fixed; fout.precision(2);
+	fout << desconto;
+	fout << endl;
+
+	fout.width(30); fout << right << "Total";
+	fout << "   =   R$";
+	fout << fixed; fout.precision(2); 
+	fout << valordaCompra - desconto;
+	fout << endl;
+
+	fout.close();
+
+
+
+	cout << "Recibo criado.\n";
+	system("Pause");
+}
 
 void Adicionar(produto* lista, char* tamanho)
 {
