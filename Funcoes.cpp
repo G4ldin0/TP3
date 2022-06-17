@@ -119,7 +119,11 @@ void Pedir(produto* estoque, char* tamanho)
 		int pos = 0;
 		for(pos; pos < *tamanho && strcmp(temp.nome, estoque[pos].nome); pos++);
 		
-		if(pos >= tamanhoNovoVetor) pedido = AumentarTamanhodeVetor(pedido, &tamanhoNovoVetor);
+		if(pos >= tamanhoNovoVetor)
+		{
+			pedido = AumentarTamanhodeVetor(pedido, &tamanhoNovoVetor);
+			strcpy(estoque[pos-1].nome, temp.nome);
+		}
 		strcpy(pedido[pos].nome, temp.nome);
 		pedido[pos].quantidade += temp.quantidade;
 
@@ -135,7 +139,7 @@ void Pedir(produto* estoque, char* tamanho)
 	
 	if (falha)
 	{
-		for (int i = 0; i < *tamanho && estoque[i].nome[0] != 0; i++)
+		for (int i = 0; i < *tamanho /* && estoque[i].nome[0] != 0*/; i++)
 		{
 			if (pedido[i].quantidade > estoque[i].quantidade)
 				cout << pedido[i].nome << ": Solicitado = " << pedido[i].quantidade << "kg / Em estoque = " << estoque[i].quantidade << "kg" << endl;

@@ -97,6 +97,7 @@ int main()
 		fout.write((char*)&estoque[i].preco, 4);
 		fout.write((char*)&estoque[i].quantidade, 4);
 	}
+
 	fout.close();
 	delete[] estoque;
 }
