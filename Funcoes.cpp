@@ -90,7 +90,10 @@ void Pedir(produto* estoque, char* tamanho)
 	//vetor com pedidos
 	produto* pedido = new produto[8]{};
 
-	bool falha{};
+
+
+	bool falha = false;
+
 
 	//entrada das informações
 	produto temp;
@@ -113,31 +116,33 @@ void Pedir(produto* estoque, char* tamanho)
 
 		//confere onde adicionar a quantidade no vetor dinâmico
 		int pos = 0;
-		for(pos; strcmp(temp.nome, estoque[pos].nome); pos++)
-			if(temp.quantidade > estoque[pos].quantidade)
-				falha = true;
+		for(pos; strcmp(temp.nome, estoque[pos].nome); pos++);
 		strcpy(pedido[pos].nome, temp.nome);
 		pedido[pos].quantidade += temp.quantidade;
 
 	}
 
-	
+	//confere o que está em falta
+	for(int i = 0; i < *tamanho && estoque[i].quantidade > 0; i++)
+		if (pedido[i].quantidade > estoque[i].quantidade)
+			falha |= true;
+
 
 	//processamento das informações
-	if (falha) //se tem falha
+	
+	if (falha)
 	{
-		for(int i = 0; i < 5; i++)
+		for (int i = 0; i < *tamanho && pedido[i].quantidade > 0; i++)
 		{
 			if (pedido[i].quantidade > estoque[i].quantidade)
 				cout << pedido[i].nome << ": Solicitado = " << pedido[i].quantidade << "kg / Em estoque = " << estoque[i].quantidade << "kg" << endl;
 		}
 	}
-	else //se não tiver
+	else
 	{
-
 		float valordaCompra{};
 		float desconto{};
-		for (int i = 0; i < 5; i++){
+		for (int i = 0; i < *tamanho && pedido[i].quantidade > 0; i++) {
 			pedido[i].preco = estoque[i].preco * pedido[i].quantidade;
 			valordaCompra += pedido[i].preco;
 			estoque[i].quantidade -= pedido[i].quantidade;
