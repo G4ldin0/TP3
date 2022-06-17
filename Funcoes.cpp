@@ -90,7 +90,8 @@ void Pedir(produto* estoque, char* tamanho)
 	}
 
 	//vetor com pedidos
-	produto* pedido = new produto[8]{};
+	char tamanhoNovoVetor = 8;
+	produto* pedido = new produto[tamanhoNovoVetor]{};
 
 
 	bool falha = false;
@@ -116,7 +117,9 @@ void Pedir(produto* estoque, char* tamanho)
 
 		//confere onde adicionar a quantidade no vetor dinâmico
 		int pos = 0;
-		for(pos; strcmp(temp.nome, estoque[pos].nome); pos++);
+		for(pos; pos < *tamanho && strcmp(temp.nome, estoque[pos].nome); pos++);
+		
+		if(pos >= tamanhoNovoVetor) pedido = AumentarTamanhodeVetor(pedido, &tamanhoNovoVetor);
 		strcpy(pedido[pos].nome, temp.nome);
 		pedido[pos].quantidade += temp.quantidade;
 
