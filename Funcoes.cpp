@@ -15,25 +15,27 @@ istream& operator>>(istream& is, produto& a)
 
 //funções de caso geral
 
-void linha(ostream& os, char ch, unsigned char tam) {
+void linha(char ch, unsigned char tam, ostream& os) {
 	for (char i = 0; i < tam; i++)
 		os << ch;
 	os << endl;
 }
 
-produto* AumentarTamanhodeVetor(produto vetor[], char* tamanho)
+produto* AumentarTamanhodeVetor(produto* vetor, char* tamanho)
 {
+	//define o novo vetor
+	char novoTamanho = pow(2, log2f(*tamanho) + 1);
+	produto* temp = new produto[novoTamanho]{};
+	
+	//copia os elementos do vetor antigo para o novo
+	for (int i = 0; i <= *tamanho; i++)
+		temp[i] = vetor[i];
+	
+	for (int j = *tamanho; j < novoTamanho; j++)
+		temp[j] = {0, 0, 0};
 
-	produto* temp = new produto[*tamanho + 2]
-	{
-		{"a", 1, 10},
-		{"b", 2, 20},
-		{"c", 3, 30},
-		{"d", 4, 40},
-		{"e", 5, 50},
-		{"f", 6, 60},
-	};
-	delete[] vetor;
+	//aumenta a variavel do tamanho e retorna o novo vetor
+	*tamanho = novoTamanho;
 	return temp;
 }
 
@@ -57,6 +59,8 @@ void menu() {
 
 void Pedir(produto* estoque, char* tamanho)
 {
+
+	system("cls");
 	//abrindo o arquivo
 	char nomedoArquivo[16];
 	char txt[16]{};
@@ -85,15 +89,11 @@ void Pedir(produto* estoque, char* tamanho)
 		system("Cls");
 	}
 
-
-
 	//vetor com pedidos
 	produto* pedido = new produto[8]{};
 
 
-
 	bool falha = false;
-
 
 	//entrada das informações
 	produto temp;
@@ -123,8 +123,8 @@ void Pedir(produto* estoque, char* tamanho)
 	}
 
 	//confere o que está em falta
-	for(int i = 0; i < *tamanho && estoque[i].quantidade > 0; i++)
-		if (pedido[i].quantidade > estoque[i].quantidade)
+	for(int i = 0; i < *tamanho && estoque[i].nome[0] != 0; i++)
+		if (estoque[i].quantidade < pedido[i].quantidade)
 			falha |= true;
 
 
@@ -132,17 +132,18 @@ void Pedir(produto* estoque, char* tamanho)
 	
 	if (falha)
 	{
-		for (int i = 0; i < *tamanho && pedido[i].quantidade > 0; i++)
+		for (int i = 0; i < *tamanho && estoque[i].nome[0] != 0; i++)
 		{
 			if (pedido[i].quantidade > estoque[i].quantidade)
 				cout << pedido[i].nome << ": Solicitado = " << pedido[i].quantidade << "kg / Em estoque = " << estoque[i].quantidade << "kg" << endl;
 		}
+		system("Pause");
 	}
 	else
 	{
 		float valordaCompra{};
 		float desconto{};
-		for (int i = 0; i < *tamanho && pedido[i].quantidade > 0; i++) {
+		for (int i = 0; i < *tamanho && estoque[i].nome[0] != 0; i++) {
 			pedido[i].preco = estoque[i].preco * pedido[i].quantidade;
 			valordaCompra += pedido[i].preco;
 			estoque[i].quantidade -= pedido[i].quantidade;
@@ -156,7 +157,7 @@ void Pedir(produto* estoque, char* tamanho)
 		fout.open(strcat(nomedoArquivo, ".nfc"));
 		fout.fill(' ');
 		fout << "Pizzaria Mamute\n";
-		linha(fout, '-', 50);
+		linha('-', 50, fout);
 		for (int i = 0; i < 5; i++)
 		{
 			fout.width(10); 
@@ -185,7 +186,7 @@ void Pedir(produto* estoque, char* tamanho)
 			fout << endl;
 		}
 
-		linha(fout, '-', 50);
+		linha( '-', 50, fout);
 
 
 		fout.width(30); fout << right << "Compra";
@@ -215,49 +216,73 @@ void Pedir(produto* estoque, char* tamanho)
 	}
 }
 
-void Adicionar(produto* lista, char* tamanho)
+void Adicionar(produto*& lista, char* tamanho)
 {
+	system("cls");
+	cout << "Adicionar\n";
+	linha('-', 8);
+
+
 	produto temp;
 	cin >> temp;
 
+	//formalizar o nome
+	temp.nome[0] = toupper(temp.nome[0]);
+	for(int i = 1; temp.nome[i] != 0; i++)
+		temp.nome[i] = tolower(temp.nome[i]);
+
+	//conta quantos elementos tem, e confere se já tem algum identico
 	int contador = 0;
-	for(contador; lista[contador].nome[0] != 0 && contador < *tamanho; contador++);
+	for (contador; (lista[contador].nome[0] != 0 && contador < *tamanho) && strcmp(temp.nome, lista[contador].nome); contador++);
 
-	//if(contador >= *tamanho - 1) lista = AumentarTamanhodeVetor(lista, tamanho);
+	if(contador >= *tamanho) lista = AumentarTamanhodeVetor(lista, tamanho);
 
-	lista[contador] = temp;
+	strcpy(lista[contador].nome, temp.nome);
+	lista[contador].preco = temp.preco;
+	lista[contador].quantidade += temp.quantidade;
 
 }
 
 void Listar(produto* lista, char tamanho)
 {
+	system("cls");
 
-	cout << fixed; cout.precision(2);
+
+	cout << "Listagem\n";
+	linha('-', 8);
+	
 	for(int i = 0; i < tamanho && lista[i].nome[0] != 0; i++)
 	{
 		cout.width(10);
 		cout << left << lista[i].nome;
 		cout << " - R$";
-		cout.width(5);
+		cout.width(5); cout << fixed; cout.precision(2);
 		cout << left << lista[i].preco;
 		cout << " - ";
-		cout.width(3);
+		cout.width(3); cout << fixed; cout.precision(0);
 		cout << right << lista[i].quantidade;
 		cout << "kg";
 		cout << endl;
 	}
 
+	cout << endl;
 	system("Pause");
 }
 
-void Excluir(produto* lista, char* tam)
+void Excluir(produto*& lista, char* tam)
 {
+	system("cls");
+
 	int escolha;
 	
+	cout << "Excluir\n";
+	linha('-', 8);
+
 	//exibir os elementos
-	cout << "Qual elemento remover: \n";
-	for (int i = 0; i < *tam; i++)
+	for (int i = 0; i < *tam && lista[i].nome[0] != '\0'; i++)
 		cout << i+1 << ") " << lista[i].nome << endl;
+	
+	cout << "Número do produto: ";
 
 	//escolhe o elemento a ser retirado
 	cin >> escolha;
